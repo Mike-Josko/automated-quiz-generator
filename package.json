@@ -1,0 +1,30 @@
+{
+  "name": "automated-quiz-generator",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mike-Josko/automated-quiz-generator.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Mike-Josko/automated-quiz-generator/issues"
+  },
+  "homepage": "https://github.com/Mike-Josko/automated-quiz-generator#readme",
+  "dependencies": {
+    "express": "^5.2.1",
+    "mongodb": "^7.1.0",
+    "multer": "^2.0.2",
+    "natural": "^8.1.0",
+    "pdf-parse": "^1.1.1",
+    "pdfkit": "^0.18.0"
+  }
+}
