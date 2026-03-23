@@ -1,13 +1,10 @@
-const mongoose = require('mongoose');
+const { Sequelize } = require('sequelize');
 
-const connectDB = async () => {
-    try {
-        const conn = await mongoose.connect(process.env.MONGO_URI);
-        console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
-    } catch (error) {
-        console.error(`❌ MongoDB Connection Error: ${error.message}`);
-        process.exit(1); // Stop the server if the database fails
-    }
-};
+// This tells it to save the database locally in a file called database.sqlite
+const sequelize = new Sequelize({
+    dialect: 'sqlite',
+    storage: './database.sqlite',
+    logging: false // Keeps your terminal clean
+});
 
-module.exports = connectDB;
+module.exports = sequelize;

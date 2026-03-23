@@ -1,10 +1,15 @@
-const mongoose = require('mongoose');
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/db');
+const User = require('./User');
 
-const quizSchema = new mongoose.Schema({
-    lecturerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-    title: { type: String, default: 'Automated Quiz' },
-    questions: { type: Array, required: true },
-    pdfUrl: { type: String }
-}, { timestamps: true });
+const Quiz = sequelize.define('Quiz', {
+    title: { type: DataTypes.STRING, defaultValue: 'Automated Quiz' },
+    questions: { type: DataTypes.JSON, allowNull: false }, // SQLite can save our JSON arrays directly!
+    pdfUrl: { type: DataTypes.STRING }
+});
 
-module.exports = mongoose.model('Quiz', quizSchema);
+// This links a Quiz to a specific Lecturer (User)
+User.hasMany(Quiz, { foreignKey: 'lecturerId' });
+Quiz.belongsTo(User, { foreignKey: 'lecturerId' });
+
+module.exports = Quiz;

@@ -1,21 +1,35 @@
-require('dotenv').config(); // MUST BE AT THE VERY TOP
+require('dotenv').config();
 const express = require('express');
 const path = require('path');
-const connectDB = require('./config/db'); // Import our DB connection
+const session = require('express-session'); // The Session Bouncer
+const sequelize = require('./config/db'); 
 const apiRoutes = require('./routes/api');
+const authRoutes = require('./routes/auth'); // Our new Auth routes!
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Connect to MongoDB
-connectDB();
-
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../public')));
 
-app.use('/api', apiRoutes);
+// Set up the Session (This creates the secure cookie)
+app.use(session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: { secure: false, maxAge: 1000 * 60 * 60 * 24 } // 24-hour session
+}));
 
-app.listen(PORT, () => {
-    console.log(`🚀 Server running on http://localhost:${PORT}`);
-    console.log('Automated Quiz Generator is READY!');
+// Use our routes
+app.use('/api', apiRoutes);
+app.use('/auth', authRoutes); // Tell the server about the login routes
+
+// Sync the database and start the server
+sequelize.sync().then(() => {
+    console.log('✅ SQLite Database Connected and Synced!');
+    app.listen(PORT, () => {
+        console.log(`🚀 Server running on http://localhost:${PORT}`);
+    });
+}).catch(err => {
+    console.error('❌ Database connection failed:', err);
 });

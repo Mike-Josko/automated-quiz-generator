@@ -1,126 +1,404 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Automated Quiz Generator - Portal</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automated Quiz Generator - React Portal</title>
+    
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; padding: 40px; display: flex; justify-content: center; }
-        .card { background: white; border-radius: 10px; padding: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 600px; }
-        h2 { color: #2c3e50; margin-top: 0; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; color: #555; }
-        .form-group input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background-color: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold; margin-top: 10px; }
-        button:hover { background-color: #2980b9; }
-        .btn-success { background-color: #27ae60; }
-        .btn-success:hover { background-color: #219653; }
-        #result { margin-top: 20px; }
-        .error-msg { color: #e74c3c; font-size: 14px; margin-top: 10px; display: none; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0;
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
+            min-height: 100vh;
+            transition: background-color 0.3s;
+        }
+        
+        .bg-green { background-color: #f4f7f6; background-image: none; } 
+        .bg-light { background-color: #f4f7f6; padding: 40px 0; background-image: none; }
+        
+        .card { width: 100%; max-width: 400px; padding: 35px 40px; box-sizing: border-box; border-radius: 4px; }
+        .card.green-theme { background: #1cc665; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); border: none; }
+        .card.light-theme { background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.2); max-width: 850px; }
+        
+        h2 { margin-top: 0; text-align: center; font-size: 24px; letter-spacing: 1px; }
+        .green-theme h2 { color: white; font-weight: bold; }
+        .light-theme h2 { color: #333; }
+
+        hr { border: 0; border-top: 1px solid rgba(255, 255, 255, 0.5); margin: 25px 0; }
+        .light-theme hr { border-top: 1px solid #ddd; }
+
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-size: 14px; font-weight: bold; }
+        .green-theme .form-group label { color: white; }
+        .light-theme .form-group label { color: #333; }
+        
+        .form-group input, .form-group select, .form-group textarea { 
+            width: 100%; padding: 12px; border: 2px solid #00bcd4; border-radius: 2px; box-sizing: border-box; font-size: 15px; 
+        }
+        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #ffca28; }
+
+        .btn-primary { width: 100%; padding: 14px; background-color: #ffca28; color: black; border: none; border-radius: 2px; cursor: pointer; font-size: 18px; font-weight: bold; margin-top: 10px; }
+        .btn-primary:hover { background-color: #ffb300; }
+        .btn-secondary { width: 100%; padding: 14px; background-color: #ffb74d; color: white; border: none; border-radius: 2px; cursor: pointer; font-size: 16px; }
+        .btn-secondary:hover { background-color: #ffa726; }
+        .btn-dark { background-color: #003366; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; text-decoration: none; display: inline-block;}
+        .btn-orange { background-color: #e67e22; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; text-decoration: none; display: inline-block;}
+
+        .helper-text { color: white; display: block; margin-bottom: 12px; font-size: 15px; text-align: center; }
+
+        .message-box { padding: 12px; border-radius: 2px; margin-bottom: 15px; text-align: center; font-weight: bold; }
+        .error { background-color: white; color: #c0392b; border-left: 5px solid #e74c3c; }
+        .success { background-color: white; color: #27ae60; border-left: 5px solid #2ecc71; }
+
         .header-bar { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 15px; margin-bottom: 20px; }
-        .logout-link { color: #e74c3c; text-decoration: none; cursor: pointer; font-size: 14px; }
+        .logout-link { color: #e74c3c; text-decoration: none; cursor: pointer; font-size: 14px; font-weight: bold; }
+        
+        table { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 10px; }
+        th { padding: 12px; background: #f4f7f6; text-align: left; border-bottom: 2px solid #ddd; color: #333; }
+        td { padding: 12px; border-bottom: 1px solid #eee; color: #555; }
     </style>
 </head>
 <body>
+    <div id="root"></div>
 
-    <div id="loginView" class="card">
-        <h2 style="text-align: center;">📚 University Portal Login</h2>
-        <p style="text-align: center; color: #7f8c8d; margin-bottom: 25px;">Enter your lecturer credentials to access your quiz dashboard.</p>
-        
-        <form id="loginForm">
-            <div class="form-group">
-                <label>Lecturer ID (Username)</label>
-                <input type="text" id="username" placeholder="e.g., admin" required>
-            </div>
-            <div class="form-group">
-                <label>Password</label>
-                <input type="password" id="password" placeholder="e.g., demo123" required>
-            </div>
-            <button type="submit">Secure Login</button>
-            <p id="loginError" class="error-msg">Incorrect credentials. Try admin / demo123</p>
-        </form>
-    </div>
+    <script type="text/babel">
+        const { useState, useEffect } = React;
 
-    <div id="dashboardView" class="card" style="display: none;">
-        <div class="header-bar">
-            <div>
-                <h2>Welcome, <span id="lecturerName" style="color: #3498db;">Dr. Smith</span></h2>
-                <p style="color: #7f8c8d; margin: 0;">Automated Quiz Generator Dashboard</p>
-            </div>
-            <a class="logout-link" onclick="logout()">Logout</a>
-        </div>
-        
-        <form id="uploadForm">
-            <div class="form-group">
-                <label><strong>1. Upload Lecture Notes (PDF or TXT)</strong></label>
-                <input type="file" id="fileInput" name="documents" accept=".pdf, .txt" multiple required>
-            </div>
-            <button type="submit" class="btn-success">Generate Quiz & Answer Key</button>
-        </form>
+        function App() {
+            const [user, setUser] = useState(null);
+            const [view, setView] = useState('login'); 
+            const [message, setMessage] = useState(null);
 
-        <div id="result"></div>
-    </div>
+            useEffect(() => {
+                fetch('/auth/me')
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            setUser(data.user);
+                            document.body.className = 'bg-light';
+                        } else {
+                            document.body.className = 'bg-green';
+                        }
+                    });
+            }, []);
 
-    <script>
-        // --- Login Logic ---
-        document.getElementById('loginForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const user = document.getElementById('username').value;
-            const pass = document.getElementById('password').value;
+            const showMsg = (text, type = 'success') => {
+                setMessage({ text, type });
+                setTimeout(() => setMessage(null), 4000);
+            };
 
-            // Fake Authentication for the Demo
-            if (user === 'admin' && pass === 'demo123') {
-                document.getElementById('loginView').style.display = 'none';
-                document.getElementById('dashboardView').style.display = 'block';
-                document.getElementById('lecturerName').innerText = "Dr. Admin";
-            } else {
-                document.getElementById('loginError').style.display = 'block';
-            }
-        });
+            const handleLogout = async () => {
+                await fetch('/auth/logout', { method: 'POST' });
+                setUser(null);
+                document.body.className = 'bg-green';
+            };
 
-        // --- Logout Logic ---
-        function logout() {
-            document.getElementById('dashboardView').style.display = 'none';
-            document.getElementById('loginView').style.display = 'block';
-            document.getElementById('loginForm').reset();
-            document.getElementById('result').innerHTML = ''; // Clear previous quiz
-            document.getElementById('loginError').style.display = 'none';
+            if (user) return <Dashboard user={user} onLogout={handleLogout} />;
+
+            return (
+                <div className="card green-theme">
+                    {message && <div className={`message-box ${message.type}`}>{message.text}</div>}
+                    {view === 'login' ? (
+                        <LoginForm setView={setView} setUser={setUser} showMsg={showMsg} />
+                    ) : (
+                        <RegisterForm setView={setView} showMsg={showMsg} />
+                    )}
+                </div>
+            );
         }
 
-        // --- Quiz Generation Logic (Your existing working code!) ---
-        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const resultDiv = document.getElementById('result');
-            resultDiv.innerHTML = "<br>Processing files and generating NLP concepts... please wait ⏳";
+        function LoginForm({ setView, setUser, showMsg }) {
+            const [username, setUsername] = useState('');
+            const [password, setPassword] = useState('');
 
-            const formData = new FormData();
-            const files = document.getElementById('fileInput').files;
-            for(let i = 0; i < files.length; i++) {
-                formData.append('documents', files[i]);
-            }
-
-            try {
-                const response = await fetch('/api/generate', { method: 'POST', body: formData });
-                const data = await response.json();
-
+            const onSubmit = async (e) => {
+                e.preventDefault();
+                const res = await fetch('/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await res.json();
                 if (data.success) {
-                    const cleanPreview = data.preview.map(q => ({ type: q.type, question: q.question, options: q.options }));
-                    
-                    resultDiv.innerHTML = `
-                        <br>
-                        <p style="color: green; font-weight: bold;">✅ ${data.message}</p>
-                        <a href="${data.downloadUrl}" target="_blank" style="text-decoration: none;">
-                            <button style="background-color: #28a745; width: auto;">📄 Download Printable Quiz (PDF)</button>
-                        </a>
-                        <hr style="margin-top: 25px;">
-                        <h3>Preview of Generated Questions:</h3>
-                        <pre style="background:#f4f4f4; padding:15px; border-radius:5px; overflow-x:auto; font-size: 12px;">${JSON.stringify(cleanPreview, null, 2)}</pre>
-                    `;
+                    setUser(data.user);
+                    document.body.className = 'bg-light';
                 } else {
-                    resultDiv.innerHTML = `<p style="color:red;">Error: ${data.error}</p>`;
+                    showMsg(data.message, 'error');
                 }
-            } catch (err) {
-                resultDiv.innerHTML = `<p style="color:red;">Server connection failed.</p>`;
-            }
-        });
+            };
+
+            return (
+                <div>
+                    <h2>PORTAL LOGIN</h2>
+                    <hr/>
+                    <form onSubmit={onSubmit}>
+                        <div className="form-group">
+                            <label>Username</label>
+                            <input type="text" value={username} onChange={e => setUsername(e.target.value)} required />
+                        </div>
+                        <div className="form-group">
+                            <label>Password</label>
+                            <input type="password" value={password} onChange={e => setPassword(e.target.value)} required />
+                        </div>
+                        <button type="submit" className="btn-primary">Login</button>
+                    </form>
+                    <hr/>
+                    <span className="helper-text">Click below to easily create an account</span>
+                    <button className="btn-secondary" onClick={() => setView('register')}>REGISTER NEW LECTURER</button>
+                </div>
+            );
+        }
+
+        function RegisterForm({ setView, showMsg }) {
+            const [name, setName] = useState('');
+            const [email, setEmail] = useState(''); 
+            const [password, setPassword] = useState('');
+
+            const onSubmit = async (e) => {
+                e.preventDefault();
+                const res = await fetch('/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, username: email, password })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showMsg(data.message, 'success');
+                    setView('login');
+                } else {
+                    showMsg(data.message, 'error');
+                }
+            };
+
+            return (
+                <div>
+                    <h2>REGISTER LECTURER</h2>
+                    <hr/>
+                    <form onSubmit={onSubmit}>
+                        <div className="form-group">
+                            <label>Full Name</label>
+                            <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="e.g., Dr. Jane Smith" required />
+                        </div>
+                        <div className="form-group">
+                            <label>Email Address</label>
+                            <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="name@must.ac.ke" required />
+                        </div>
+                        <div className="form-group">
+                            <label>Create Password</label>
+                            <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" required />
+                        </div>
+                        <button type="submit" className="btn-primary">Register</button>
+                    </form>
+                    <hr/>
+                    <button className="btn-secondary" onClick={() => setView('login')}>BACK TO LOGIN</button>
+                </div>
+            );
+        }
+
+        function Dashboard({ user, onLogout }) {
+            const [status, setStatus] = useState('');
+            const [result, setResult] = useState(null);
+            
+            // Config States
+            const [numQuestions, setNumQuestions] = useState(10);
+            const [difficulty, setDifficulty] = useState('Mixed');
+            const [qType, setQType] = useState('All');
+
+            // --- NEW: History State & Search State ---
+            const [searchQuery, setSearchQuery] = useState('');
+            const [history, setHistory] = useState([
+                { id: 1, date: '2024-03-20', topic: 'Information Systems Architecture.pdf', count: 15, type: 'Mixed' },
+                { id: 2, date: '2024-03-18', topic: 'Database Normalization Notes.txt', count: 10, type: 'MCQ' },
+                { id: 3, date: '2024-03-15', topic: 'Cybersecurity Fundamentals.pdf', count: 20, type: 'True/False' }
+            ]);
+
+            const filteredHistory = history.filter(h => 
+                h.topic.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                h.date.includes(searchQuery)
+            );
+
+            const handleUpload = async (e) => {
+                e.preventDefault();
+                setStatus('Processing files and generating NLP concepts... please wait ⏳');
+                setResult(null);
+
+                const formData = new FormData();
+                const fileInput = document.getElementById('fileInput');
+                for (let i = 0; i < fileInput.files.length; i++) {
+                    formData.append('documents', fileInput.files[i]);
+                }
+                
+                formData.append('numQuestions', numQuestions);
+                formData.append('difficulty', difficulty);
+                formData.append('questionType', qType);
+
+                try {
+                    const res = await fetch('/api/generate', { method: 'POST', body: formData });
+                    const data = await res.json();
+                    
+                    if (data.success) {
+                        setStatus('✅ Quiz Generated Successfully!');
+                        setResult(data);
+                        
+                        // Add the new quiz to the history table automatically!
+                        const newHistoryItem = {
+                            id: Date.now(),
+                            date: new Date().toISOString().split('T')[0],
+                            topic: fileInput.files[0].name,
+                            count: numQuestions,
+                            type: qType === 'All' ? 'Mixed' : qType
+                        };
+                        setHistory([newHistoryItem, ...history]);
+                        
+                    } else {
+                        setStatus(`❌ Error: ${data.error}`);
+                    }
+                } catch (err) {
+                    setStatus('❌ Server connection failed.');
+                }
+            };
+
+            return (
+                <div className="card light-theme" style={{margin: '0 auto'}}>
+                    <div className="header-bar">
+                        <div>
+                            <h2>Welcome, <span style={{color: '#1cc665'}}>{user.name}</span></h2>
+                            <p style={{color: '#7f8c8d', margin: 0}}>Automated Quiz Generator Dashboard</p>
+                        </div>
+                        <a className="logout-link" onClick={onLogout}>Logout</a>
+                    </div>
+
+                    <form onSubmit={handleUpload}>
+                        <div className="form-group">
+                            <label>1. Upload Lecture Notes (PDF or TXT)</label>
+                            <input type="file" id="fileInput" accept=".pdf, .txt" multiple required style={{border: '1px solid #ccc', background: '#f9f9f9'}}/>
+                        </div>
+
+                        <div style={{background: '#f4f7f6', padding: '15px', borderRadius: '4px', border: '1px solid #ddd', marginBottom: '20px'}}>
+                            <label style={{color: '#333', marginBottom: '10px', display: 'block'}}>2. Quiz Configuration</label>
+                            <div style={{display: 'flex', gap: '15px', flexWrap: 'wrap'}}>
+                                <div className="form-group" style={{flex: 1, minWidth: '120px', marginBottom: 0}}>
+                                    <label style={{fontSize: '13px', color: '#555', fontWeight:'normal'}}>Number of Questions</label>
+                                    <input type="number" value={numQuestions} onChange={e => setNumQuestions(e.target.value)} min="1" max="50" style={{padding: '8px', border:'1px solid #ccc'}}/>
+                                </div>
+                                <div className="form-group" style={{flex: 1, minWidth: '120px', marginBottom: 0}}>
+                                    <label style={{fontSize: '13px', color: '#555', fontWeight:'normal'}}>Difficulty Level</label>
+                                    <select value={difficulty} onChange={e => setDifficulty(e.target.value)} style={{padding: '8px', border:'1px solid #ccc'}}>
+                                        <option value="Mixed">Mixed Difficulty</option>
+                                        <option value="Easy">Easy</option>
+                                        <option value="Medium">Medium</option>
+                                        <option value="Hard">Hard</option>
+                                    </select>
+                                </div>
+                                <div className="form-group" style={{flex: 1, minWidth: '120px', marginBottom: 0}}>
+                                    <label style={{fontSize: '13px', color: '#555', fontWeight:'normal'}}>Question Types</label>
+                                    <select value={qType} onChange={e => setQType(e.target.value)} style={{padding: '8px', border:'1px solid #ccc'}}>
+                                        <option value="All">All Types (Mixed)</option>
+                                        <option value="MCQ">Multiple Choice</option>
+                                        <option value="TF">True/False</option>
+                                        <option value="Short">Short Answer</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" className="btn-primary" style={{backgroundColor: '#003366', color: 'white'}}>Generate Quiz & Answer Key</button>
+                    </form>
+
+                    <div style={{marginTop: '20px'}}>
+                        <p style={{fontWeight: 'bold', color: status.includes('✅') ? '#27ae60' : '#c0392b'}}>{status}</p>
+                        
+                        {/* THE EDITABLE PREVIEW (Shows when a quiz is generated) */}
+                        {result && (
+                            <div style={{ marginBottom: '40px' }}>
+                                <div style={{display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '20px'}}>
+                                    <a href={result.downloadUrl} target="_blank" className="btn-dark">📄 Download Printable Exam (PDF)</a>
+                                    <a href={result.moodleUrl} download className="btn-orange">🎓 Download for Moodle (LMS)</a>
+                                </div>
+                                
+                                <h3 style={{ marginTop: '30px', borderBottom: '2px solid #eee', paddingBottom: '10px' }}>📝 Editable Quiz Preview</h3>
+                                <p style={{ fontSize: '14px', color: '#7f8c8d', marginBottom: '20px' }}>Review, edit, or delete questions below. Changes will be saved to your dashboard.</p>
+                                
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                                    {result.preview.map((q, index) => (
+                                        <div key={index} style={{ background: 'white', padding: '20px', border: '1px solid #e0e0e0', borderRadius: '6px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+                                                <span style={{ fontWeight: 'bold', color: '#003366', fontSize: '16px' }}>Question {index + 1} <span style={{ color: '#999', fontSize: '12px', fontWeight: 'normal' }}>({q.type})</span></span>
+                                                <button style={{ background: '#fadbd8', color: '#c0392b', border: 'none', borderRadius: '4px', padding: '5px 10px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>🗑️ Delete</button>
+                                            </div>
+                                            <textarea defaultValue={q.question} style={{ width: '100%', padding: '10px', marginBottom: '15px', border: '1px solid #ccc', borderRadius: '4px', fontFamily: 'inherit', fontSize: '14px', resize: 'vertical', boxSizing: 'border-box' }} rows="2" />
+                                            {q.options && q.options.map((opt, oIndex) => (
+                                                <div key={oIndex} style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+                                                    <span style={{ width: '25px', fontWeight: 'bold', color: '#555' }}>{String.fromCharCode(65 + oIndex)})</span>
+                                                    <input type="text" defaultValue={opt} style={{ flex: 1, padding: '8px', border: '1px solid #eee', borderRadius: '4px', fontSize: '14px' }} />
+                                                </div>
+                                            ))}
+                                            <div style={{ marginTop: '15px', background: '#e8f8f5', padding: '10px', borderRadius: '4px', display: 'flex', alignItems: 'center' }}>
+                                                <strong style={{ color: '#117a65', marginRight: '10px', fontSize: '14px' }}>Correct Answer:</strong> 
+                                                <input type="text" defaultValue={q.answer} style={{ flex: 1, padding: '6px 10px', border: '1px solid #a3e4d7', borderRadius: '4px', color: '#117a65', fontWeight: 'bold', background: 'white' }} />
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                                <button className="btn-primary" style={{ backgroundColor: '#27ae60', color: 'white', marginTop: '20px' }}>💾 Save Final Edits</button>
+                            </div>
+                        )}
+
+                        {/* --- SCREEN #8: THE QUIZ HISTORY VAULT --- */}
+                        <div style={{ marginTop: '50px', paddingTop: '20px', borderTop: '3px solid #eee' }}>
+                            <h3 style={{ color: '#333', marginBottom: '5px' }}>🗄️ Quiz History Vault</h3>
+                            <p style={{ fontSize: '14px', color: '#7f8c8d', marginBottom: '15px' }}>Access previously generated quizzes. Search by topic or date.</p>
+                            
+                            <input 
+                                type="text" 
+                                placeholder="🔍 Search by topic (e.g., Networking) or date (YYYY-MM-DD)..." 
+                                value={searchQuery}
+                                onChange={e => setSearchQuery(e.target.value)}
+                                style={{ width: '100%', padding: '10px', marginBottom: '20px', border: '1px solid #ccc', borderRadius: '4px', boxSizing: 'border-box' }}
+                            />
+
+                            <div style={{ overflowX: 'auto' }}>
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Topic / Source File</th>
+                                            <th>Details</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {filteredHistory.map(item => (
+                                            <tr key={item.id}>
+                                                <td style={{ fontWeight: '500' }}>{item.date}</td>
+                                                <td style={{ color: '#003366', fontWeight: 'bold' }}>{item.topic}</td>
+                                                <td>{item.count} Qs ({item.type})</td>
+                                                <td>
+                                                    <button style={{ background: '#003366', color: 'white', border: 'none', padding: '6px 10px', borderRadius: '4px', marginRight: '5px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>PDF</button>
+                                                    <button style={{ background: '#e67e22', color: 'white', border: 'none', padding: '6px 10px', borderRadius: '4px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>LMS</button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                                {filteredHistory.length === 0 && <p style={{ textAlign: 'center', color: '#999', marginTop: '20px' }}>No quizzes found matching your search.</p>}
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
     </script>
 </body>
 </html>

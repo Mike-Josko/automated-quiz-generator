@@ -5,8 +5,19 @@ const extractText = async (filePath, mimeType) => {
     try {
         if (mimeType === 'application/pdf') {
             const dataBuffer = fs.readFileSync(filePath);
-            // With version 1.1.1, this works perfectly every single time.
+            
+            // --- THE SILENCER ---
+            // Temporarily mute console warnings so 'pdf-parse' doesn't spam us
+            const originalWarn = console.warn;
+            console.warn = function() {}; 
+            
+            // Read the PDF
             const data = await pdf(dataBuffer);
+            
+            // Restore console warnings immediately after
+            console.warn = originalWarn;
+            // --------------------
+
             return data.text;
         } else {
             // Text file fallback

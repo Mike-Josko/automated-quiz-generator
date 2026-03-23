@@ -6,6 +6,7 @@ const { extractText } = require('../utils/fileParser');
 const { processText } = require('../utils/nlpProcessor');
 const { generateQuestions } = require('../utils/questionGenerator');
 const { generateQuizPDF } = require('../utils/pdfExporter');
+const { generateMoodleGIFT } = require('../utils/moodleExporter');
 
 const upload = multer({ dest: 'uploads/' });
 
@@ -23,17 +24,23 @@ router.post('/generate', upload.any(), async (req, res) => {
         }
 
         const nlpData = processText(combinedText);
-        const questions = generateQuestions(nlpData);
-        
-        const pdfFileName = `Quiz_${Date.now()}.pdf`;
-        const pdfDownloadUrl = await generateQuizPDF(questions, pdfFileName);
+     const questions = generateQuestions(nlpData);
 
-        res.json({
-            success: true,
-            message: 'Quiz Generated Successfully!',
-            downloadUrl: pdfDownloadUrl,
-            preview: questions
-        });
+     // Generate BOTH files simultaneously
+     const timestamp = Date.now();
+     const pdfFileName = `Quiz_${timestamp}.pdf`;
+     const moodleFileName = `Quiz_${timestamp}_Moodle.txt`;
+
+     const pdfDownloadUrl = await generateQuizPDF(questions, pdfFileName);
+     const moodleDownloadUrl = await generateMoodleGIFT(questions, moodleFileName); // <-- NEW
+
+     res.json({
+         success: true,
+         message: 'Quiz Generated Successfully!',
+         downloadUrl: pdfDownloadUrl,
+         moodleUrl: moodleDownloadUrl, // <-- Send the new URL to the frontend
+         preview: questions
+     });
 
     } catch (error) {
         console.error(error);
