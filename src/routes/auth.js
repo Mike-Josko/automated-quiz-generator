@@ -15,7 +15,7 @@ router.post('/register', async (req, res) => {
         if (!staffIdRegex.test(staffId)) {
             return res.status(400).json({ 
                 success: false, 
-                message: 'Invalid Staff ID format. Must be like MUST-SCI-0042.' 
+                message: 'Invalid Staff ID format.' 
             });
         }
 
@@ -51,6 +51,8 @@ router.post('/register', async (req, res) => {
 
 // --- 2. LOGIN AN EXISTING LECTURER ---
 router.post('/login', async (req, res) => {
+    // 1. THE BREADCRUMB: Put this right at the top so we know the phone reached the server
+    console.log("🚦 Login attempt received for username:", req.body.username);
     try {
         const { username, password } = req.body; // Frontend sends 'username' for either email or staffId
 
@@ -85,8 +87,10 @@ router.post('/login', async (req, res) => {
         });
 
     } catch (error) {
-        console.error('Login Error:', error);
-        res.status(500).json({ success: false, message: 'Server error during login.' });
+        // WE MUST FORCE VERCEL TO PRINT THIS:
+        console.error("❌ FATAL LOGIN ERROR DETAILS:", error);
+        
+        res.status(500).json({ message: "Server error during login" });
     }
 });
 
